@@ -1,29 +1,21 @@
 import { blinq } from "blinq";
 import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
-import { posts, User, users } from "./store/db";
+import { getPosts, User, getUsers } from "./store/api";
 
 export const Profile = (props: { username: string }) => {
     const [user, setUser] = useState<User>();
 
     useEffect(() => {
-        setUser(
-            blinq(users)
-                .where((u) => u.username === props.username)
-                .first()
+        getUsers().then((users) =>
+            setUser(
+                blinq(users)
+                    .where((u) => u.username === props.username)
+                    .first()
+            )
         );
     }, [props.username]);
 
-    const userPosts = user
-        ? blinq(posts)
-              .where((u) => u.username === user.username)
-              .count()
-        : 0;
-    const userFollowers = user
-        ? blinq(users)
-              .where((u) => u.following.includes(u.username))
-              .count()
-        : 0;
     const userFollowing = user ? blinq(user.following).count() : 0;
 
     return user ? (
@@ -48,7 +40,7 @@ export const Profile = (props: { username: string }) => {
                 <h4 className="text-xl text-gray-400">@{user.username}</h4>
                 <p className="text-lg">{user.bio}</p>
                 <small className="text-gray-400 text-lm">
-                    Joined {dayjs(user.joinedAt).format("MM YYYY")}
+                    Joined {dayjs(user.joinedAt).format("M YYYY")}
                 </small>
                 <div className="flex flex-row justify-start items-center text-lg">
                     <small className="text-gray-400 mr-2">

@@ -5,13 +5,14 @@ import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faHashtag, faHome, faUser } from "@fortawesome/free-solid-svg-icons";
 import { useStore } from "@logux/state/react";
 import { currentUser } from "./store/user";
-import { posts, Post, users } from "./store/db";
-import { blinq } from "blinq";
+import { getPosts, getProfiles, Post } from "./store/api";
 import { Profile } from "./Profile";
 
 export const App = () => {
     const user = useStore(currentUser);
-    const [currentPosts, setCurrentPosts] = useState<Post[]>([]);
+    const [currentPosts, setCurrentPosts] = useState<
+        (Post & { avatar?: string })[]
+    >([]);
 
     const [links, setLinks] = useState<
         { href: string; content: ReactNode; name: string }[]
@@ -42,11 +43,20 @@ export const App = () => {
     const postsPerPage = 10;
 
     useEffect(() => {
-        setCurrentPosts(
-            blinq(posts)
-                .takeWhile((_x, i) => i < postsPerPage)
-                .toArray()
-        );
+        getPosts().then((posts) => {
+            getProfiles().then((users) =>
+                setCurrentPosts(
+                    posts
+                        .filter((_x, i) => i < postsPerPage)
+                        .map((p) => ({
+                            ...p,
+                            // Find the corresponding avatar for each post
+                            avatar: users.find((u) => u.username === p.username)
+                                ?.avatar
+                        }))
+                )
+            );
+        });
     }, []);
 
     return (
@@ -96,15 +106,7 @@ export const App = () => {
                                         <div className="w-12">
                                             <img
                                                 className="rounded-full"
-                                                src={
-                                                    blinq(users)
-                                                        .where(
-                                                            (u) =>
-                                                                u.username ===
-                                                                post.username
-                                                        )
-                                                        .first()?.avatar
-                                                }
+                                                src={post.avatar}
                                                 alt={post.username}
                                             />
                                         </div>
