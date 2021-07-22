@@ -1,21 +1,44 @@
 import fp from "fastify-plugin";
-import session from "fastify-secure-session";
-import type { FastifyInstance } from "fastify";
+import jwt from "fastify-jwt";
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+
+declare module "fastify" {
+    export interface FastifyInstance {
+        authenticate: (
+            request: FastifyRequest,
+            reply: FastifyReply
+        ) => Promise<void>;
+    }
+}
+
+declare module "fastify-jwt" {
+    interface FastifyJWT {
+        payload: { id: string };
+    }
+}
 
 export default fp(
     async (fastify: FastifyInstance) => {
-        if (!process.env.SESSION_SECRET) {
-            fastify.log.error("No SESSION_SECRET environment variable found.");
+        if (!process.env.JWT_SECRET) {
+            fastify.log.error("No JWT_SECRET environment variable found.");
             process.exit(1);
         }
-        // await fastify.register(cookie);
-        await fastify.register(session, {
-            key: Buffer.from(process.env.SESSION_SECRET, "hex"),
-            cookie: {
-                httpOnly: true,
-                secure: process.env.NODE_ENV !== "development"
-            }
+        await fastify.register(jwt, {
+            secret: process.env.JWT_SECRET ?? "secret69420"
         });
+
+        fastify.decorate(
+            "authenticate",
+            async (req: FastifyRequest, res: FastifyReply) => {
+                try {
+                    await req.jwtVerify();
+                } catch (err) {
+                    return res.status(401).send({
+                        error: "You must be logged in to access this resource"
+                    });
+                }
+            }
+        );
     },
     { name: "session" }
 );

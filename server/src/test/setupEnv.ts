@@ -1,6 +1,6 @@
 import fastify from "fastify";
-import { core } from "../src/index.js";
-import { migrateDown, migrateUp } from "../src/plugins/db.js";
+import { core } from "../index.js";
+import { migrateDown, migrateUp } from "../plugins/db.js";
 // import { testEvents } from "@toes/toest";
 
 export const setupTestEnvironment = () => {
@@ -23,7 +23,7 @@ export const setupTestEnvironment = () => {
     });
 
     afterAll(async () => {
-        await server.db.destroy();
+        await server.db.disconnect();
         await server.close();
     });
 

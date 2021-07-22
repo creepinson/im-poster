@@ -1,5 +1,4 @@
-export interface User {
-    id: string;
+export interface IUser {
     username: string;
     password: string;
     name: string;
@@ -9,8 +8,7 @@ export interface User {
     joinedAt: Date;
 }
 
-export interface Post {
-    id: string;
+export interface IPost {
     user: string;
     content: string;
     likes: string[];

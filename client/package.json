@@ -8,16 +8,18 @@
         "lint": "eslint src/**/*.tsx --fix"
     },
     "dependencies": {
+        "@etsoo/restclient": "^1.0.50",
         "@fortawesome/fontawesome-svg-core": "^1.2.35",
         "@fortawesome/free-brands-svg-icons": "^5.15.3",
         "@fortawesome/free-solid-svg-icons": "^5.15.3",
         "@fortawesome/react-fontawesome": "^0.1.14",
-        "@logux/state": "^0.2.0",
         "axios": "^0.21.1",
         "dayjs": "^1.10.6",
+        "pullstate": "^1.22.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-hook-form": "^7.11.1",
+        "react-toastify": "^7.0.4",
         "wouter": "^2.7.4"
     },
     "devDependencies": {

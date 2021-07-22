@@ -1,66 +1,73 @@
-import { blinq } from "blinq";
 import dayjs from "dayjs";
 import React, { useState, useEffect } from "react";
-import { getPosts, User, getUsers } from "./store/api";
+import { User, getProfiles, getPosts } from "./api";
 
 export const Profile = (props: { username: string }) => {
     const [user, setUser] = useState<User>();
 
     useEffect(() => {
-        getUsers().then((users) =>
-            setUser(
-                blinq(users)
-                    .where((u) => u.username === props.username)
-                    .first()
-            )
-        );
+        getProfiles().then((users) => {
+            const u = users?.find((u) => u.username === props.username);
+            if (u) {
+                getPosts(u.username)
+                    .then((posts) => {
+                        setUser({
+                            ...u,
+                            followers:
+                                users?.filter((us) =>
+                                    us.following.includes(u.username)
+                                ) ?? [],
+                            posts: posts ?? []
+                        });
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        setUser(u);
+                    });
+            }
+        });
     }, [props.username]);
 
-    const userFollowing = user ? blinq(user.following).count() : 0;
-
     return user ? (
-        <div className="p-4 col-span-6 md:col-span-8 lg:col-span-10">
-            <div className="md:row-span-3 flex flex-col justify-start items-start py-2 mb-4 border-b-2 border-gray-600">
-                <h2 className="font-bold text-xl">{user.username}</h2>
-                <h2 className="font-bold text-xl">
-                    {userPosts === 1
-                        ? `${userPosts} Post`
-                        : `${userPosts} Posts`}
-                </h2>
-            </div>
-            <div className="">
+        <div className="p-4 w-full">
+            <div className="w-full border-b-2 border-gray-600 mb-6">
                 <div className="w-24">
-                    <img
-                        className="mb-2 rounded-full"
-                        src={user.avatar}
-                        alt={user.username}
-                    />
+                    <img className="mb-2 rounded-full" src={user.avatar} />
                 </div>
                 <h3 className="font-bold text-xl">{user.name}</h3>
                 <h4 className="text-xl text-gray-400">@{user.username}</h4>
-                <p className="text-lg">{user.bio}</p>
-                <small className="text-gray-400 text-lm">
+                <p className="text-md">{user.bio}</p>
+                <small className="text-gray-400 text-md">
                     Joined {dayjs(user.joinedAt).format("M YYYY")}
                 </small>
                 <div className="flex flex-row justify-start items-center text-lg">
                     <small className="text-gray-400 mr-2">
                         <span className="text-white font-bold mr-1">
-                            {userFollowers === 1
-                                ? `${userFollowers}`
-                                : `${userFollowers}`}
+                            {user.followers.length === 1
+                                ? `${user.followers.length}`
+                                : `${user.followers.length}`}
                         </span>
-                        {userFollowers === 1 ? "Follower" : "Followers"}
+                        {user.followers.length === 1 ? "Follower" : "Followers"}
                     </small>
                     <small className="text-gray-400 mr-4">
                         <span className="text-white font-bold mr-1">
-                            {userFollowing === 1
-                                ? `${userFollowing}`
-                                : `${userFollowing}`}
+                            {user.following.length === 1
+                                ? `${user.following.length}`
+                                : `${user.following.length}`}
                         </span>
-                        {userFollowing === 1 ? "Following" : "Following"}
+                        {user.following.length === 1
+                            ? "Following"
+                            : "Following"}
+                    </small>
+                    <small className="text-gray-400 mr-4">
+                        <span className="text-white font-bold mr-1">
+                            {user.posts.length}
+                        </span>
+                        {user.posts.length === 1 ? " Post" : " Posts"}
                     </small>
                 </div>
             </div>
+            <h2 className="font-bold text-xl"></h2>
         </div>
     ) : (
         <div className="font-bold text-xl">

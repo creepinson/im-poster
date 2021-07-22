@@ -4,25 +4,28 @@ import dotenv from "dotenv";
 import cors from "fastify-cors";
 import autoload from "./autoload.js";
 
-export const core = fp(async (app, opts: FastifyPluginOptions) => {
-    dotenv.config();
+export const core = fp(
+    async (app, opts: FastifyPluginOptions) => {
+        dotenv.config();
 
-    // Declare a route
-    app.get("/", async () => ({ hello: "world" }));
+        // Declare a route
+        app.get("/", async () => ({ hello: "world" }));
 
-    await app.register(cors, { origin: "*", credentials: true });
+        await app.register(cors, {
+            origin: "*"
+        });
 
-    await app.register(autoload, {
-        // dirname-filename-esm
-        dir: "plugins",
-        options: { ...opts }
-    });
-    await app.register(autoload, {
-        // dirname-filename-esm
-        dir: "services",
-        options: { ...opts }
-    });
-});
+        await app.register(autoload, {
+            dir: "plugins",
+            options: { ...opts }
+        });
+        await app.register(autoload, {
+            dir: "routes",
+            options: { ...opts }
+        });
+    },
+    { name: "core" }
+);
 
 // Run the server!
 export const start = async () => {

@@ -1,11 +1,8 @@
 version: "3"
 services:
   db:
-    image: ghcr.io/creepinson/acebase
-    environment:
-      ACE_DB: imposter
-      ACE_ADMIN_PASS: 69420  
+    image: mongo:latest
     ports:
-      - 5757:5757
+      - 27017-27019:27017-27019
     volumes:
-      - ./data:/data
+      - ./data:/data/db

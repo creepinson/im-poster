@@ -4,6 +4,7 @@ module.exports = {
     moduleNameMapper: {
         "^(\\.{1,2}/.*)\\.js$": "$1"
     },
+    testPathIgnorePatterns: ["data", "dist"],
     transform: {
         "^.+\\.[t|j]sx?$": "babel-jest"
     },

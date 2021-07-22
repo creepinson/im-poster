@@ -1,11 +1,11 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@etsoo/restclient': ^1.0.50
   '@fortawesome/fontawesome-svg-core': ^1.2.35
   '@fortawesome/free-brands-svg-icons': ^5.15.3
   '@fortawesome/free-solid-svg-icons': ^5.15.3
   '@fortawesome/react-fontawesome': ^0.1.14
-  '@logux/state': ^0.2.0
   '@theoparis/eslint-config': github:creepinson/eslint-config#update
   '@types/react': ^17.0.14
   '@types/react-dom': ^17.0.9
@@ -16,25 +16,29 @@ specifiers:
   eslint: ^7.31.0
   postcss: ^8.3.5
   prettier: ^2.3.2
+  pullstate: ^1.22.1
   react: ^17.0.2
   react-dom: ^17.0.2
   react-hook-form: ^7.11.1
+  react-toastify: ^7.0.4
   tailwindcss: ^2.2.4
   typescript: ^4.3.5
   vite: ^2.4.2
   wouter: ^2.7.4
 
 dependencies:
+  '@etsoo/restclient': 1.0.50
   '@fortawesome/fontawesome-svg-core': 1.2.35
   '@fortawesome/free-brands-svg-icons': 5.15.3
   '@fortawesome/free-solid-svg-icons': 5.15.3
   '@fortawesome/react-fontawesome': 0.1.14_ec0af2bc0907a851e3e0afc4708fd0f0
-  '@logux/state': 0.2.0_react@17.0.2
   axios: 0.21.1
   dayjs: 1.10.6
+  pullstate: 1.22.1_react@17.0.2
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   react-hook-form: 7.11.1_react@17.0.2
+  react-toastify: 7.0.4_react-dom@17.0.2+react@17.0.2
   wouter: 2.7.4_react@17.0.2
 
 devDependencies:
@@ -262,16 +266,16 @@ packages:
       '@babel/helper-plugin-utils': 7.14.5
     dev: true
 
-  /@babel/runtime-corejs3/7.14.7:
-    resolution: {integrity: sha512-Wvzcw4mBYbTagyBVZpAJWI06auSIj033T/yNE0Zn1xcup83MieCddZA7ls3kme17L4NOGBrQ09Q+nKB41RLWBA==}
+  /@babel/runtime-corejs3/7.14.8:
+    resolution: {integrity: sha512-4dMD5QRBkumn45oweR0SxoNtt15oz3BUBAQ8cIx7HJqZTtE8zjpM0My8aHJHVnyf4XfRg6DNzaE1080WLBiC1w==}
     engines: {node: '>=6.9.0'}
     dependencies:
       core-js-pure: 3.15.2
       regenerator-runtime: 0.13.7
     dev: true
 
-  /@babel/runtime/7.14.6:
-    resolution: {integrity: sha512-/PCB2uJ7oM44tz8YhC4Z/6PeOKXp4K588f+5M3clr1M4zbqztlo0XEfJ2LEzj/FgwfgGcIdl8n7YYjTCI0BYwg==}
+  /@babel/runtime/7.14.8:
+    resolution: {integrity: sha512-twj3L8Og5SaCRCErB4x4ajbvBIVV77CGeFglHpeg5WC5FF8TZzBWXtTJ4MqaD9QszLYTtr+IsaAL2rEUevb+eg==}
     engines: {node: '>=6.9.0'}
     dependencies:
       regenerator-runtime: 0.13.7
@@ -327,6 +331,19 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@etsoo/restclient/1.0.50:
+    resolution: {integrity: sha512-SFSb6lmvrZb0SSKQoQhfVUbpiH5wgEqDnU75sH4REHpowSABVLihecB4GCy9u2i5ORt0qwpSucqjpMqlFIU3/w==}
+    dependencies:
+      '@etsoo/shared': 1.0.39
+      axios: 0.21.1
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /@etsoo/shared/1.0.39:
+    resolution: {integrity: sha512-Vc/VeWv1Th4PAIFdTDitGMJY55gaYsEMD+0owXMr1+nhYSt2KNUKJw64JyS6LmDCiHGZL1sDcOpF2Tgb4NstjQ==}
+    dev: false
 
   /@fortawesome/fontawesome-common-types/0.2.35:
     resolution: {integrity: sha512-IHUfxSEDS9dDGqYwIW7wTN6tn/O8E0n5PcAHz9cAaBoZw6UpG20IG/YM3NNLaGPwPqgjBAFjIURzqoQs3rrtuw==}
@@ -392,24 +409,6 @@ packages:
   /@humanwhocodes/object-schema/1.2.0:
     resolution: {integrity: sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==}
     dev: true
-
-  /@logux/state/0.2.0_react@17.0.2:
-    resolution: {integrity: sha512-XtX7PJ6yxhj8OmMnBAMSWNUhyJdmUPQvI9nSYEYwuKpo4hSIF9KIlcNMd18CzoKvm1BaAY7Xn/uD0xQ3QJhbWg==}
-    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
-    peerDependencies:
-      preact: '>=10.0.0'
-      react: '>=16.8.0'
-      vue: '>=3.0.11'
-    peerDependenciesMeta:
-      preact:
-        optional: true
-      react:
-        optional: true
-      vue:
-        optional: true
-    dependencies:
-      react: 17.0.2
-    dev: false
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -679,8 +678,8 @@ packages:
     resolution: {integrity: sha512-o/HelwhuKpTj/frsOsbNLNgnNGVIFsVP/SW2BSF14gVl7kAfMOJ6/8wUAUvG1R1NHKrfG+2sHZTu0yauT1qBrA==}
     engines: {node: '>=6.0'}
     dependencies:
-      '@babel/runtime': 7.14.6
-      '@babel/runtime-corejs3': 7.14.7
+      '@babel/runtime': 7.14.8
+      '@babel/runtime-corejs3': 7.14.8
     dev: true
 
   /array-includes/3.1.3:
@@ -852,6 +851,11 @@ packages:
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
+
+  /clsx/1.1.1:
+    resolution: {integrity: sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==}
+    engines: {node: '>=6'}
+    dev: false
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -1163,7 +1167,7 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7
     dependencies:
-      '@babel/runtime': 7.14.6
+      '@babel/runtime': 7.14.8
       aria-query: 4.2.2
       array-includes: 3.1.3
       ast-types-flow: 0.0.7
@@ -1366,7 +1370,6 @@ packages:
 
   /fast-deep-equal/3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
-    dev: true
 
   /fast-diff/1.2.0:
     resolution: {integrity: sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==}
@@ -1582,6 +1585,10 @@ packages:
     resolution: {integrity: sha512-BMpfD7PpiETpBl/A6S498BaIJ6Y/ABT93ETbby2fP00v4EbvPBXWEoaR1UBPKs3iR53pJY7EtZk5KACI57i1Uw==}
     engines: {node: '>= 4'}
     dev: true
+
+  /immer/8.0.4:
+    resolution: {integrity: sha512-jMfL18P+/6P6epANRvRk6q8t+3gGhqsJ9EuJ25AXE+9bNTYtssvzeYbEd0mXRYWCmmXSIbnlpz6vd6iJlmGGGQ==}
+    dev: false
 
   /import-cwd/3.0.0:
     resolution: {integrity: sha512-4pnzH16plW+hgvRECbDWpQl3cqtvSofHWh44met7ESfZ8UZOWWddm8hEyDTqREJ9RbYHY8gi8DqmaelApoOGMg==}
@@ -2215,6 +2222,16 @@ packages:
       object-assign: 4.1.1
       react-is: 16.13.1
 
+  /pullstate/1.22.1_react@17.0.2:
+    resolution: {integrity: sha512-Xu3umsGOG6qCQ4IWxKSEikQqdR7GDsTHQPE7wquzQENMRZbPeHURA9dZgH/9ktuhDh3D1qnIDI9PyPftabme0A==}
+    peerDependencies:
+      react: ^16.12.0 || ^17.0.0
+    dependencies:
+      fast-deep-equal: 3.1.3
+      immer: 8.0.4
+      react: 17.0.2
+    dev: false
+
   /punycode/2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
     engines: {node: '>=6'}
@@ -2265,6 +2282,17 @@ packages:
     resolution: {integrity: sha512-PgidR3wST3dDYKr6b4pJoqQFpPGNKDSCDx4cZoshjXipw3LzO7mG1My2pwEzz2JVkF+inx3xRpDeQLFQGH/hsQ==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /react-toastify/7.0.4_react-dom@17.0.2+react@17.0.2:
+    resolution: {integrity: sha512-Rol7+Cn39hZp5hQ/k6CbMNE2CKYV9E5OQdC/hBLtIQU2xz7DdAm7xil4NITQTHR6zEbE5RVFbpgSwTD7xRGLeQ==}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      clsx: 1.1.1
+      react: 17.0.2
+      react-dom: 17.0.2_react@17.0.2
+    dev: false
 
   /react/17.0.2:
     resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}

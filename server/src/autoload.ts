@@ -9,7 +9,7 @@ export default fp(
         opts: { dir: string; options: FastifyPluginOptions }
     ) => {
         const __dirname = dirname(import.meta);
-        const files = await glob("**/*.ts", {
+        const files = await glob("**/*.{ts,js}", {
             cwd: `${__dirname}/${opts.dir}`
         });
         for await (const file of files) {

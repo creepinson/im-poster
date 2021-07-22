@@ -1,59 +1,37 @@
 import fp from "fastify-plugin";
-import knex, { Knex } from "knex";
+import mongoose from "mongoose";
 import type { FastifyInstance } from "fastify";
 
 declare module "fastify" {
     // eslint-disable-next-line no-shadow
     export interface FastifyInstance {
-        db: Knex;
+        db: typeof mongoose;
     }
 }
 
-export const migrateUp = async (app: FastifyInstance) => {
-    if (!(await app.db.schema.hasTable("users")))
-        await app.db.schema.createTable(
-            "users",
-            (table: Knex.CreateTableBuilder) => {
-                table.text("id").primary().unique().notNullable();
+export const migrateUp = async (app: FastifyInstance) => {};
 
-                table.string("username", 255).unique().notNullable();
-                table.string("password", 255).notNullable();
-                table.string("name", 255).notNullable();
-                table.string("avatar", 255);
-                table.string("bio", 255).notNullable();
-                table.json("following").notNullable();
-
-                table.timestamp("joinedAt").defaultTo(app.db.fn.now());
-            }
-        );
-
-    if (!(await app.db.schema.hasTable("posts")))
-        await app.db.schema.createTable(
-            "posts",
-            (table: Knex.CreateTableBuilder) => {
-                table.text("id").primary().unique().notNullable();
-
-                table.text("user").notNullable();
-                table.text("content").notNullable();
-                table.json("likes").notNullable();
-            }
-        );
-};
-
-export const migrateDown = async (app: FastifyInstance) => {
-    await app.db.schema.dropTableIfExists("users");
-    await app.db.schema.dropTableIfExists("posts");
-};
+export const migrateDown = async (app: FastifyInstance) => {};
 
 export default fp(
     async (fastify: FastifyInstance, _opts: unknown, next: () => void) => {
-        const dbUri = process.env.POSTGRES_URI;
-        if (!dbUri) throw new Error("POSTGRES_URI is not defined");
-
-        const db = knex({
-            client: "pg",
-            connection: dbUri
-        });
+        const dbUri =
+            process.env.NODE_ENV === "test"
+                ? "mongodb://localhost/test"
+                : process.env.MONGO_URI;
+        if (!dbUri) throw new Error("MONGO_URI is not defined");
+        let db: typeof mongoose;
+        try {
+            db = await mongoose.connect(dbUri, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useCreateIndex: true,
+                serverSelectionTimeoutMS: 5000
+            });
+        } catch (e) {
+            fastify.log.error(`Unable to connect to database: ${e.message}`);
+            process.exit(1);
+        }
 
         fastify.decorate("db", db);
 

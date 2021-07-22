@@ -1,8 +1,12 @@
 import { FastifyPluginAsync } from "fastify";
-import { argon2id, argon2Verify } from "hash-wasm";
-import { User } from "../types.js";
-import crypto from "crypto";
-import { nanoid } from "nanoid";
+import { argon2Verify } from "hash-wasm";
+import { IUser } from "../types.js";
+import {
+    createUser,
+    findAllUsers,
+    findUser,
+    findUserBy
+} from "../services/user.service.js";
 
 const userService: FastifyPluginAsync = async (app) => {
     app.route<{ Body: { username: string; password: string } }>({
@@ -18,23 +22,16 @@ const userService: FastifyPluginAsync = async (app) => {
                 }
             },
             response: {
-                500: {
+                409: {
                     type: "object",
                     required: ["error"],
                     properties: {
-                        error: { type: "string" }
+                        error: { type: "string", const: "Username is taken." }
                     }
                 },
                 201: {
                     type: "object",
-                    required: [
-                        "username",
-                        "id",
-                        "name",
-                        "bio",
-                        "following",
-                        "joinedAt"
-                    ],
+                    required: [""],
                     properties: {
                         username: {
                             type: "string"
@@ -47,8 +44,8 @@ const userService: FastifyPluginAsync = async (app) => {
                         },
                         following: { type: "array", items: { type: "string" } },
                         joinedAt: { type: "string" },
-                        id: {
-                            type: "number"
+                        _id: {
+                            type: "string"
                         }
                     }
                 }
@@ -57,45 +54,27 @@ const userService: FastifyPluginAsync = async (app) => {
         handler: async (req, res) => {
             const { username, password } = req.body;
             try {
-                const salt = crypto.randomBytes(16);
-                const hashedPassword = await argon2id({
-                    password,
-                    salt,
-                    parallelism: 1,
-                    iterations: 256,
-                    memorySize: 512, // use 512KB memory
-                    hashLength: 32, // output size = 32 bytes
-                    outputType: "encoded" // return standard encoded string containing parameters needed to verify the key
-                });
-
-                const userData: Partial<User> = {
-                    id: nanoid(32),
+                const userData: IUser = {
                     username,
                     name: username,
-                    password: hashedPassword,
+                    password,
                     joinedAt: new Date(),
                     following: [],
                     bio: "Hello world."
                 };
 
-                await app.db
-                    .insert({
-                        ...userData,
-                        following: JSON.stringify(userData.following)
-                    })
-                    .into<User>("users");
-
-                const finalUser = (await app
-                    .db<User>("users")
-                    .select()
-                    .where("username", userData.username)
-                    .first()) as Partial<User>;
-                delete finalUser.password;
+                const finalUser = await createUser(userData);
 
                 // app.log.debug(finalUser);
 
-                return res.status(201).send(finalUser);
+                return res
+                    .status(201)
+                    .send({ ...finalUser, password: undefined });
             } catch (error) {
+                if (error.code === 11000)
+                    return res
+                        .status(409)
+                        .send({ error: "Username is taken." });
                 app.log.error(error);
                 return res.status(500).send({
                     error: "Failed to complete signup"
@@ -141,9 +120,10 @@ const userService: FastifyPluginAsync = async (app) => {
                 },
                 200: {
                     type: "object",
-                    required: ["userId"],
+                    required: ["userId", "token"],
                     properties: {
-                        userId: { type: "string" }
+                        userId: { type: "string" },
+                        token: { type: "string" }
                     }
                 }
             }
@@ -151,11 +131,9 @@ const userService: FastifyPluginAsync = async (app) => {
         handler: async (req, res) => {
             try {
                 const { username, password } = req.body;
-                const user = await app
-                    .db<User>("users")
-                    .select()
-                    .where("username", "=", username)
-                    .first();
+                const user = await findUser({
+                    username
+                });
                 if (!user) {
                     return res.status(404).send({
                         error: "User not found"
@@ -172,9 +150,10 @@ const userService: FastifyPluginAsync = async (app) => {
                         error: "Invalid password"
                     });
 
-                req.session.set("userId", user.id);
+                const token = await res.jwtSign({ id: user._id });
                 return res.status(200).send({
-                    userId: user.id
+                    userId: user._id,
+                    token
                 });
             } catch (err) {
                 app.log.error(err);
@@ -186,29 +165,22 @@ const userService: FastifyPluginAsync = async (app) => {
         }
     });
 
-    app.get("/profile", async (req, res) => {
-        try {
-            const userId: string | undefined = req.session.get("userId");
-            const user = await app
-                .db<User>("users")
-                .select(
-                    "username",
-                    "avatar",
-                    "id",
-                    "bio",
-                    "following",
-                    "joinedAt",
-                    "name"
-                )
-                .where("id", userId)
-                .first();
-            return res.status(200).send(user);
-        } catch (err) {
-            return res.status(401).send({
-                error: "You must be logged in to view this resource."
-            });
+    app.get(
+        "/profile",
+        { preValidation: app.authenticate },
+        async (req, res) => {
+            try {
+                const userId: string | undefined = req.user.id;
+                console.log(userId);
+                const user = await findUserBy(userId);
+                return res.status(200).send({ ...user?.toJSON(), password: undefined });
+            } catch (err) {
+                return res.status(401).send({
+                    error: "You must be logged in to view this resource."
+                });
+            }
         }
-    });
+    );
 
     app.get<{
         Params: {
@@ -226,14 +198,7 @@ const userService: FastifyPluginAsync = async (app) => {
                 type: "array";
                 items: {
                     type: "object";
-                    required: [
-                        "username",
-                        "id",
-                        "name",
-                        "bio",
-                        "following",
-                        "joinedAt"
-                    ];
+                    required: ["_id"];
                     properties: {
                         username: {
                             type: "string";
@@ -246,8 +211,8 @@ const userService: FastifyPluginAsync = async (app) => {
                         };
                         following: { type: "array"; items: { type: "string" } };
                         joinedAt: { type: "string" };
-                        id: {
-                            type: "number";
+                        _id: {
+                            type: "string";
                         };
                     };
                 };
@@ -255,18 +220,14 @@ const userService: FastifyPluginAsync = async (app) => {
         };
     }>("/profiles", async (req, res) => {
         try {
-            const users = await app
-                .db<User>("users")
-                .select(
-                    "username",
-                    "avatar",
-                    "id",
-                    "bio",
-                    "following",
-                    "joinedAt",
-                    "name"
-                );
-            return res.status(200).send(users);
+            const users = await findAllUsers();
+
+            return res.status(200).send(
+                users.map((u) => ({
+                    ...u.toJSON(),
+                    password: undefined
+                }))
+            );
         } catch (err) {
             return res.status(401).send({
                 error: "You must be logged in to view this resource."
